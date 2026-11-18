@@ -206,22 +206,35 @@ async def create_task(task_data: TaskCreate) -> Task:
 async def update_task(task_id: int, updates: TaskUpdate) -> Task:
     """
     Update an existing task (partial update supported).
-
     TODO (TP 1 - Exercice 2) : écrire cette fonction.
-
     Comportement attendu (c'est ce que vos tests test_update_* doivent vérifier) :
     - 404 si la tâche n'existe pas (même message que get_task) ;
     - seuls les champs envoyés par le client sont modifiés, les autres restent identiques ;
     - created_at ne change pas, updated_at prend la date actuelle ;
     - renvoie la tâche mise à jour.
-
     Indices :
     - create_task() montre comment construire une Task ;
     - updates.model_dump(exclude_unset=True) renvoie un dictionnaire contenant
       uniquement les champs envoyés, par exemple {"status": "done"}.
     """
     # TODO: Votre code ici
-    raise HTTPException(status_code=501, detail="Update not implemented yet - complete this function!")
+    task = await get_task(task_id)
+    changes = updates.model_dump(exclude_unset=True)
+
+    updated_task = Task(
+        id = task.id,
+        title = changes.get("title", task.title),
+        description = changes.get("description", task.description),
+        status = changes.get("status", task.status),
+        priority = changes.get("priority", task.priority),
+        assignee = changes.get("assignee", task.assignee),
+        due_date = changes.get("due_date", task.due_date),
+        created_at = task.created_at,
+        updated_at = datetime.now(timezone.utc)
+    )
+    tasks_db[task_id] = updated_task
+    logger.info(f"Task updated successfully: {task_id}")
+    return updated_task
 
 
 @app.delete("/tasks/{task_id}", status_code=204)
@@ -238,8 +251,9 @@ async def delete_task(task_id: int):
     Indice : get_task(), plus haut dans ce fichier, vérifie déjà si une tâche existe.
     """
     # TODO: Votre code ici
-    raise HTTPException(status_code=501, detail="Delete not implemented yet - complete this function!")
-
+    await get_task(task_id)
+    del tasks_db[task_id]
+    logger.info(f"Task deleted successfully: {task_id}")
 
 if __name__ == "__main__":  # pragma: no cover (lancement manuel, pas testé)
     import uvicorn
