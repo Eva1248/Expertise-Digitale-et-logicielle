@@ -1,3 +1,7 @@
+# TaskFlow API
+
+![CI Pipeline](https://github.com/Eva1248/Expertise-Digitale-et-logicielle/actions/workflows/ci-pipeline.yml/badge.svg)
+
 # 🚀 EDL Starter - Code de Démarrage
 
 Bienvenue dans le code de démarrage pour les ateliers d'Environnement de Développement Logiciel (EDL) !
